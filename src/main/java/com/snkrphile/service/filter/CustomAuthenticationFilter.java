@@ -56,7 +56,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
-                .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", access_token);
