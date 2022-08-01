@@ -5,13 +5,15 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.snkrphile.service.domain.Role;
-import com.snkrphile.service.domain.User;
+import com.snkrphile.service.entities.Closet;
+import com.snkrphile.service.entities.FriendRequest;
+import com.snkrphile.service.entities.Role;
+import com.snkrphile.service.entities.User;
+import com.snkrphile.service.services.FriendRequestService;
 import com.snkrphile.service.services.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -33,15 +35,44 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
+    private final FriendRequestService friendRequestService;
+
     @GetMapping("/users")
     public ResponseEntity<List<User>>getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
+    }
+
+    @GetMapping("/users/{username}")
+    User getUserByUsername(@PathVariable String username) {
+        User user = userService.getUser(username);
+        return user;
+    }
+
+    @GetMapping("/user/{username}/closets")
+    Collection<Closet> getClosestByUsername(@PathVariable String username) {
+        return userService.getClosets(username);
     }
 
     @PostMapping("/user/save")
     public ResponseEntity<User>saveUser(@RequestBody User user) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/user/save").toUriString());
         return ResponseEntity.created(uri).body(userService.saveUser(user));
+    }
+
+    @PostMapping("/user/{username}/follow/{friend}")
+    User addFriendToUser(@PathVariable String username, @PathVariable String friend) {
+        userService.addFriendToUser(friend, username);
+        User user = userService.getUser(username);
+        return user;
+    }
+
+    @PostMapping("/user/{username}/send-friend-request/{receiver}")
+    String sendFriendRequest(@PathVariable String username, @PathVariable String receiver) {
+//        User user = userService.getUser(receiver);
+//        FriendRequest request = new FriendRequest(username, user);
+//        friendRequestService.saveFriendRequest(request);
+        return "Friend request sent!";
     }
 
     @PostMapping("/role/save")

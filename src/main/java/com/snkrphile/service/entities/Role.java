@@ -1,4 +1,4 @@
-package com.snkrphile.service.domain;
+package com.snkrphile.service.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

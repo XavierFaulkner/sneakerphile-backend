@@ -1,5 +1,6 @@
-package com.snkrphile.service.domain;
+package com.snkrphile.service.entities;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,11 +11,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.GenerationType.AUTO;
 
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "username")
 @Entity @Data @NoArgsConstructor @AllArgsConstructor
 public class User {
-    @Id @GeneratedValue(strategy = AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String firstName;
     private String lastName;
@@ -24,8 +27,21 @@ public class User {
     private String username;
     private String password;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Collection<Closet> closets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Collection<FriendRequest> friendRequests = new ArrayList<>();
+
     @ManyToMany(fetch = EAGER)
     private Collection<Role> roles = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(name="tbl_friends",
+            joinColumns = @JoinColumn(name="userId"),
+            inverseJoinColumns = @JoinColumn(name="friendId"))
+    private Collection<User> friends = new ArrayList<>();
+    @ManyToMany(mappedBy = "friends")
+    private Collection<User> friendsOf = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -89,5 +105,20 @@ public class User {
 
     public Collection<Role> getRoles() {
         return roles;
+    }
+
+    public Collection<Closet> getClosets() {
+        return closets;
+    }
+
+    public Collection<User> getFriends() {
+        return friends;
+    }
+    public Collection<User> getFriendsOf() {
+        return friendsOf;
+    }
+
+    public Collection<FriendRequest> getFriendRequests() {
+        return friendRequests;
     }
 }

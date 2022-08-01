@@ -1,7 +1,8 @@
 package com.snkrphile.service.services;
 
-import com.snkrphile.service.domain.User;
-import com.snkrphile.service.domain.Role;
+import com.snkrphile.service.entities.Closet;
+import com.snkrphile.service.entities.User;
+import com.snkrphile.service.entities.Role;
 import com.snkrphile.service.repo.RoleRepo;
 import com.snkrphile.service.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public void addFriendToUser(String freindUsername, String username) {
+        log.info("Adding friend {} to user {}", freindUsername, username);
+        User user = userRepo.findByUsername(username);
+        User friend = userRepo.findByUsername(freindUsername);
+        user.getFriends().add(friend);
+    }
+
+    @Override
     public User getUser(String username) {
         log.info("Fetching user {}", username);
         return userRepo.findByUsername(username);
@@ -70,5 +79,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public List<User> getUsers() {
         log.info("Fetching all users");
         return userRepo.findAll();
+    }
+
+    @Override
+    public Collection<Closet> getClosets(String username) {
+        User user = userRepo.findByUsername(username);
+        log.info("Fetching all closets for {}", user.getUsername());
+        return user.getClosets();
     }
 }
