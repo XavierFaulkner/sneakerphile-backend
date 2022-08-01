@@ -32,8 +32,8 @@ public class ServiceApplication {
 			userService.saveRole(new Role(null, "ROLE_USER"));
 			userService.saveRole(new Role(null, "ROLE_ADMIN"));
 
-			userService.saveUser(new User(null, "Xavier", "Faulkner", "xavybaby02@gmail.com", 19, 28262, "x-man", "2002", new ArrayList<>()));
-			userService.saveUser(new User(null, "Joe", "Shmoe", "joe@gmail.com", 45, 20705, "joe", "2002", new ArrayList<>()));
+			userService.saveUser(new User(null, "Xavier", "Faulkner", "xavybaby02@gmail.com", 19, 28262, "x-man", "2002", new ArrayList<>(), new ArrayList<>()));
+			userService.saveUser(new User(null, "Joe", "Shmoe", "joe@gmail.com", 45, 20705, "joe", "2002", new ArrayList<>(), new ArrayList<>()));
 
 			userService.addRoleToUser("x-man", "ROLE_USER");
 			userService.addRoleToUser("x-man", "ROLE_ADMIN");

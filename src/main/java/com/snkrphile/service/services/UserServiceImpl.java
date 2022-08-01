@@ -1,5 +1,6 @@
 package com.snkrphile.service.services;
 
+import com.snkrphile.service.domain.Closet;
 import com.snkrphile.service.domain.User;
 import com.snkrphile.service.domain.Role;
 import com.snkrphile.service.repo.RoleRepo;
@@ -70,5 +71,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public List<User> getUsers() {
         log.info("Fetching all users");
         return userRepo.findAll();
+    }
+
+    @Override
+    public Collection<Closet> getClosets(String username) {
+        User user = userRepo.findByUsername(username);
+        log.info("Fetching all closets for {}", user.getUsername());
+        return user.getClosets();
     }
 }

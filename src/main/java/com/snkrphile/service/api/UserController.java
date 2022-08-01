@@ -5,8 +5,10 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.snkrphile.service.domain.Closet;
 import com.snkrphile.service.domain.Role;
 import com.snkrphile.service.domain.User;
+import com.snkrphile.service.services.ClosetService;
 import com.snkrphile.service.services.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +35,15 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
     @GetMapping("/users")
     public ResponseEntity<List<User>>getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
+    }
+
+    @GetMapping("/user/{username}/closets")
+    Collection<Closet> getClosestByUsername(@PathVariable String username) {
+        return userService.getClosets(username);
     }
 
     @PostMapping("/user/save")

@@ -1,5 +1,6 @@
 package com.snkrphile.service.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,11 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.GenerationType.AUTO;
 
 @Entity @Data @NoArgsConstructor @AllArgsConstructor
 public class User {
-    @Id @GeneratedValue(strategy = AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String firstName;
     private String lastName;
@@ -23,6 +23,9 @@ public class User {
     private int location;
     private String username;
     private String password;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Collection<Closet> closets = new ArrayList<>();
 
     @ManyToMany(fetch = EAGER)
     private Collection<Role> roles = new ArrayList<>();
@@ -89,5 +92,9 @@ public class User {
 
     public Collection<Role> getRoles() {
         return roles;
+    }
+
+    public Collection<Closet> getClosets() {
+        return closets;
     }
 }
