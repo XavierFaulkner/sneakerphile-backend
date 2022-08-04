@@ -10,7 +10,7 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service @RequiredArgsConstructor @Transactional @Slf4j
-public class FriendRequestImpl implements FriendRequestService{
+public class FriendRequestServiceImpl implements FriendRequestService{
 
     private final FriendRequestRepo friendRequestRepo;
 
@@ -22,5 +22,10 @@ public class FriendRequestImpl implements FriendRequestService{
     @Override
     public Optional<FriendRequest> findById(Long id) {
         return friendRequestRepo.findById(id);
+    }
+
+    @Override
+    public void deleteRequest(FriendRequest request) {
+        friendRequestRepo.delete(request);
     }
 }

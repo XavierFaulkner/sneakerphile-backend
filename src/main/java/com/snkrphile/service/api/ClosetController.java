@@ -7,6 +7,8 @@ import com.snkrphile.service.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -25,6 +27,11 @@ public class ClosetController {
         User user = userService.getUser(username);
         closet.assignUser(user);
         return closetService.saveCloset(closet);
+    }
+
+    @GetMapping("/closet/get-closets-for/{username}")
+    Collection<Closet> getClosestByUsername(@PathVariable String username) {
+        return userService.getClosets(username);
     }
 
     @GetMapping("/closet/{id}")

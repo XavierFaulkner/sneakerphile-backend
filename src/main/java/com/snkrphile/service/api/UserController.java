@@ -5,15 +5,19 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.snkrphile.service.entities.Closet;
-import com.snkrphile.service.entities.FriendRequest;
-import com.snkrphile.service.entities.Role;
-import com.snkrphile.service.entities.User;
+import com.snkrphile.service.dto.UserDto;
+import com.snkrphile.service.dtoConverter.UserConverter;
+import com.snkrphile.service.entities.*;
+import com.snkrphile.service.response.LongAndBooleanResponse;
+import com.snkrphile.service.response.ResponseHandler;
+import com.snkrphile.service.response.forms.RoleToUserForm;
 import com.snkrphile.service.services.FriendRequestService;
+import com.snkrphile.service.services.TradeOfferService;
 import com.snkrphile.service.services.UserService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -35,23 +39,29 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-
     private final FriendRequestService friendRequestService;
+    private final TradeOfferService tradeOfferService;
+    private final UserConverter userConverter;
 
-    @GetMapping("/users")
+    @GetMapping("/user/get-all")
     public ResponseEntity<List<User>>getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
     }
 
-    @GetMapping("/users/{username}")
-    User getUserByUsername(@PathVariable String username) {
+    @GetMapping("/user/{username}")
+    public ResponseEntity<Object> getUserByUsername(@PathVariable String username, Authentication auth) {
+        User principal = userService.getUser(auth.getName());
+        String principalUsername = principal.getUsername();
+        List<String> principalFriends = principal.getFriends().stream().map(User::getUsername).toList();
         User user = userService.getUser(username);
-        return user;
-    }
-
-    @GetMapping("/user/{username}/closets")
-    Collection<Closet> getClosestByUsername(@PathVariable String username) {
-        return userService.getClosets(username);
+        UserDto userDto;
+        if(principalUsername.equals(username) || principalFriends.contains(username)) {
+            userDto = userConverter.userToDto(user, false);
+            return ResponseHandler.generateResponse("User data sent.", HttpStatus.OK, userDto);
+        } else {
+            userDto = userConverter.userToDto(user, true);
+            return ResponseHandler.generateResponse("Partial user data sent.", HttpStatus.PARTIAL_CONTENT, userDto);
+        }
     }
 
     @PostMapping("/user/save")
@@ -60,19 +70,24 @@ public class UserController {
         return ResponseEntity.created(uri).body(userService.saveUser(user));
     }
 
-    @PostMapping("/user/{username}/follow/{friend}")
-    User addFriendToUser(@PathVariable String username, @PathVariable String friend) {
-        userService.addFriendToUser(friend, username);
-        User user = userService.getUser(username);
-        return user;
+    @PostMapping("/user/{username}/friend-request-response")
+    String addFriendToUser(@PathVariable String username, @RequestBody LongAndBooleanResponse response) {
+        FriendRequest request = friendRequestService.findById(response.getId()).get();
+        if(response.getAccept()) {
+            userService.addFriendToUser(username, request.getFromUser());
+            friendRequestService.deleteRequest(request);
+            return "Friend request from " + request.getFromUser() + " accepted.";
+        } else {
+            friendRequestService.deleteRequest(request);
+            return "Friend request from " + request.getFromUser() + " declined.";
+        }
     }
 
     @PostMapping("/user/{username}/send-friend-request/{receiver}")
-    String sendFriendRequest(@PathVariable String username, @PathVariable String receiver) {
-//        User user = userService.getUser(receiver);
-//        FriendRequest request = new FriendRequest(username, user);
-//        friendRequestService.saveFriendRequest(request);
-        return "Friend request sent!";
+    FriendRequest sendFriendRequest(@PathVariable String username, @PathVariable String receiver) {
+        User user = userService.getUser(receiver);
+        FriendRequest request = new FriendRequest(username, user);
+        return friendRequestService.saveFriendRequest(request);
     }
 
     @PostMapping("/role/save")
@@ -124,8 +139,4 @@ public class UserController {
         }
     }
 }
-@Data
-class RoleToUserForm{
-    private String username;
-    private String roleName;
-}
+

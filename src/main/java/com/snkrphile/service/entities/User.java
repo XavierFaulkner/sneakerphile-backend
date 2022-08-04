@@ -33,6 +33,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<FriendRequest> friendRequests = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Collection<TradeOffer> tradeOffers = new ArrayList<>();
+
     @ManyToMany(fetch = EAGER)
     private Collection<Role> roles = new ArrayList<>();
     @ManyToMany
@@ -114,11 +117,16 @@ public class User {
     public Collection<User> getFriends() {
         return friends;
     }
+
     public Collection<User> getFriendsOf() {
         return friendsOf;
     }
 
     public Collection<FriendRequest> getFriendRequests() {
         return friendRequests;
+    }
+
+    public Collection<TradeOffer> getTradeOffers() {
+        return tradeOffers;
     }
 }
