@@ -20,7 +20,7 @@ public class Closet {
 
     private Boolean hidden = false;
     @JsonIgnore
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "id")
     private User user;
 

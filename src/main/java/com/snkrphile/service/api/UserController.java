@@ -39,7 +39,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final FriendRequestService friendRequestService;
     private final TradeOfferService tradeOfferService;
     private final UserConverter userConverter;
 
@@ -68,26 +67,6 @@ public class UserController {
     public ResponseEntity<User>saveUser(@RequestBody User user) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("api/user/save").toUriString());
         return ResponseEntity.created(uri).body(userService.saveUser(user));
-    }
-
-    @PostMapping("/user/{username}/friend-request-response")
-    String addFriendToUser(@PathVariable String username, @RequestBody LongAndBooleanResponse response) {
-        FriendRequest request = friendRequestService.findById(response.getId()).get();
-        if(response.getAccept()) {
-            userService.addFriendToUser(username, request.getFromUser());
-            friendRequestService.deleteRequest(request);
-            return "Friend request from " + request.getFromUser() + " accepted.";
-        } else {
-            friendRequestService.deleteRequest(request);
-            return "Friend request from " + request.getFromUser() + " declined.";
-        }
-    }
-
-    @PostMapping("/user/{username}/send-friend-request/{receiver}")
-    FriendRequest sendFriendRequest(@PathVariable String username, @PathVariable String receiver) {
-        User user = userService.getUser(receiver);
-        FriendRequest request = new FriendRequest(username, user);
-        return friendRequestService.saveFriendRequest(request);
     }
 
     @PostMapping("/role/save")

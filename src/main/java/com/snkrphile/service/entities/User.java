@@ -36,6 +36,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<TradeOffer> tradeOffers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Collection<Alert> alerts = new ArrayList<>();
+
     @ManyToMany(fetch = EAGER)
     private Collection<Role> roles = new ArrayList<>();
     @ManyToMany
@@ -128,5 +131,9 @@ public class User {
 
     public Collection<TradeOffer> getTradeOffers() {
         return tradeOffers;
+    }
+
+    public Collection<Alert> getAlerts() {
+        return alerts;
     }
 }
