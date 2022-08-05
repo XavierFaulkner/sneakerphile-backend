@@ -1,10 +1,12 @@
 package com.snkrphile.service.api;
 
+import com.snkrphile.service.entities.Alert;
 import com.snkrphile.service.entities.FriendRequest;
 import com.snkrphile.service.entities.User;
 import com.snkrphile.service.response.LongAndBooleanResponse;
 import com.snkrphile.service.response.ResponseHandler;
 import com.snkrphile.service.response.forms.FriendRequestForm;
+import com.snkrphile.service.services.AlertService;
 import com.snkrphile.service.services.FriendRequestService;
 import com.snkrphile.service.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class FriendRequestController {
     private final FriendRequestService friendRequestService;
     private final UserService userService;
+    private final AlertService alertService;
 
     @PostMapping("/friend-request/response")
     String addFriendToUser(@RequestBody LongAndBooleanResponse response, Authentication auth) {
@@ -42,7 +45,12 @@ public class FriendRequestController {
             FriendRequest request = new FriendRequest(principal.getUsername(), receiver);
             friendRequestService.saveFriendRequest(request);
             //creat alert
-
+            Alert alert = new Alert();
+            alert.setTitle(principal.getUsername() + " sent you a friend request");
+            alert.setFromUser(principal.getUsername());
+            alert.setUser(receiver);
+            alert.setType("FRIEND-REQUEST");
+            alertService.saveAlert(alert);
             return ResponseHandler.generateResponse("Friend request sent to " + receiver.getUsername(), HttpStatus.OK, request);
         } catch(Exception e) {
             return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.BAD_REQUEST, null);

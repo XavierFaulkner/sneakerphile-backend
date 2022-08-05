@@ -23,15 +23,6 @@ public class Alert {
 
     private Long shoeTwo;
 
-    public Alert(String title, String type, String fromUser, User sendTo) {
-        this.title = title;
-        this.type = type;
-        this.fromUser = fromUser;
-        shoeOne = null;
-        shoeTwo = null;
-        user = sendTo;
-    }
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "id")
