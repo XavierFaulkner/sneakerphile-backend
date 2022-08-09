@@ -16,6 +16,8 @@ public class FriendRequest {
 
     private String fromUser;
 
+    private Long alertId;
+
     @JsonIgnore
     @ManyToOne()
     @JoinColumn(name="user_id", referencedColumnName = "id")

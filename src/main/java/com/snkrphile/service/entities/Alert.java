@@ -23,8 +23,10 @@ public class Alert {
 
     private Long shoeTwo;
 
+    private Long requestId;
+
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name="user_id", referencedColumnName = "id")
     private User user;
 }

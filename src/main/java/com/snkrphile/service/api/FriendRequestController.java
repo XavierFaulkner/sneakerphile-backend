@@ -30,6 +30,8 @@ public class FriendRequestController {
         if(response.getAccept()) {
             userService.addFriendToUser(principal.getUsername(), request.getFromUser());
             friendRequestService.deleteRequest(request);
+            Alert alert = alertService.findById(request.getAlertId()).get();
+            alertService.deleteAlert(alert);
             return "Friend request from " + request.getFromUser() + " accepted.";
         } else {
             friendRequestService.deleteRequest(request);
@@ -37,19 +39,22 @@ public class FriendRequestController {
         }
     }
 
-    @PostMapping("/friend-request/send")
+    @PutMapping("/friend-request/send")
     public ResponseEntity<Object> sendFriendRequest(@RequestBody FriendRequestForm requestForm, Authentication auth) {
         try {
             User principal = userService.getUser(auth.getName());
             User receiver = userService.getUser(requestForm.getSendTo());
             FriendRequest request = new FriendRequest(principal.getUsername(), receiver);
-            friendRequestService.saveFriendRequest(request);
-            //creat alert
             Alert alert = new Alert();
             alert.setTitle(principal.getUsername() + " sent you a friend request");
             alert.setFromUser(principal.getUsername());
             alert.setUser(receiver);
             alert.setType("FRIEND-REQUEST");
+            friendRequestService.saveFriendRequest(request);
+            alertService.saveAlert(alert);
+            alert.setRequestId(request.getId());
+            request.setAlertId(alert.getId());
+            friendRequestService.saveFriendRequest(request);
             alertService.saveAlert(alert);
             return ResponseHandler.generateResponse("Friend request sent to " + receiver.getUsername(), HttpStatus.OK, request);
         } catch(Exception e) {

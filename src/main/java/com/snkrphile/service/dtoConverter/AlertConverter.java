@@ -19,6 +19,7 @@ public class AlertConverter {
         switch(alert.getType()) {
             case "FRIEND-REQUEST":
                 User fromUser = userService.getUser(alert.getFromUser());
+                dto.setRequestId(alert.getRequestId());
                 //get user since
                 //get total num of shoes
                 dto.setNumOfCollections(fromUser.getClosets().size());
