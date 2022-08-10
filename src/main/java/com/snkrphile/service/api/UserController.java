@@ -8,10 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.snkrphile.service.dto.UserDto;
 import com.snkrphile.service.dtoConverter.UserConverter;
 import com.snkrphile.service.entities.*;
-import com.snkrphile.service.response.LongAndBooleanResponse;
 import com.snkrphile.service.response.ResponseHandler;
 import com.snkrphile.service.response.forms.RoleToUserForm;
-import com.snkrphile.service.services.FriendRequestService;
 import com.snkrphile.service.services.TradeOfferService;
 import com.snkrphile.service.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +45,8 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getUsers());
     }
 
-    @GetMapping("/user/{username}")
-    public ResponseEntity<Object> getUserByUsername(@PathVariable String username, Authentication auth) {
+    @GetMapping("/user/get-info")
+    public ResponseEntity<Object> getUserByUsername(@RequestParam String username, Authentication auth) {
         User principal = userService.getUser(auth.getName());
         String principalUsername = principal.getUsername();
         List<String> principalFriends = principal.getFriends().stream().map(User::getUsername).toList();

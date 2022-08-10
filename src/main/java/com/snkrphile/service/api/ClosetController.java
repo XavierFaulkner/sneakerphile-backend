@@ -5,6 +5,7 @@ import com.snkrphile.service.entities.User;
 import com.snkrphile.service.services.ClosetService;
 import com.snkrphile.service.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -17,7 +18,9 @@ public class ClosetController {
     private final UserService userService;
 
     @PostMapping("closet/save")
-    Closet saveCloset(@RequestBody Closet closet) {
+    Closet saveCloset(@RequestBody Closet closet, Authentication auth) {
+        User principal = userService.getUser(auth.getName());
+        closet.assignUser(principal);
         return closetService.saveCloset(closet);
     }
 

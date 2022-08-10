@@ -19,8 +19,8 @@ public class ShoeController {
         return shoeService.saveShoe(shoe);
     }
 
-    @PutMapping("/{shoeId}/shoe/{closetId}")
-    Shoe assignClosetToShoe(@PathVariable Long shoeId, @PathVariable Long closetId) {
+    @PostMapping("/shoe/assign")
+    Shoe assignClosetToShoe(@RequestParam Long shoeId, @RequestParam Long closetId) {
         Shoe shoe = shoeService.findById(shoeId).get();
         Closet closet = closetService.findById(closetId).get();
         shoe.assignCloset(closet);

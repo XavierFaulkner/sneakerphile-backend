@@ -35,11 +35,13 @@ public class FriendRequestController {
             return "Friend request from " + request.getFromUser() + " accepted.";
         } else {
             friendRequestService.deleteRequest(request);
+            Alert alert = alertService.findById(request.getAlertId()).get();
+            alertService.deleteAlert(alert);
             return "Friend request from " + request.getFromUser() + " declined.";
         }
     }
 
-    @PutMapping("/friend-request/send")
+    @PostMapping("/friend-request/send")
     public ResponseEntity<Object> sendFriendRequest(@RequestBody FriendRequestForm requestForm, Authentication auth) {
         try {
             User principal = userService.getUser(auth.getName());
